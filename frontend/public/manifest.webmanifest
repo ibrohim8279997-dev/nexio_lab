@@ -1,0 +1,11 @@
+{
+  "name": "Nexio Lab",
+  "short_name": "Nexio Lab",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#1268ed",
+  "icons": [
+    { "src": "/brand/nexio-logo-light.png", "sizes": "1254x1254", "type": "image/png" }
+  ]
+}

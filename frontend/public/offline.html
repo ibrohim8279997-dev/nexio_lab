@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07111f">
+  <title>Nexio Lab — Offline</title>
+  <style>
+    :root{color-scheme:light;--page:#f7f9fc;--card:rgba(255,255,255,.9);--text:#07111f;--muted:#637083;--line:#dce5f1}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at 72% 36%,rgba(22,135,255,.18),transparent 32%),linear-gradient(145deg,#fff,var(--page));color:var(--text)}body.dark{color-scheme:dark;--page:#071426;--card:rgba(12,24,40,.92);--text:#f2f7ff;--muted:#9baabd;--line:#21344b;background:radial-gradient(circle at 72% 36%,rgba(0,184,217,.12),transparent 31%),linear-gradient(145deg,#030812,#071426)}header{display:flex;justify-content:space-between;align-items:center;padding:24px clamp(18px,5vw,72px)}header img{width:160px;height:auto}.logo-dark{display:none}body.dark .logo-light{display:none}body.dark .logo-dark{display:block}.langs{display:flex;gap:4px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--card)}.langs button{width:34px;height:30px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-weight:700}.langs button.active{background:#1268ed;color:#fff}main{width:min(670px,calc(100% - 32px));margin:7vh auto;padding:clamp(30px,6vw,64px);border:1px solid var(--line);border-radius:30px;background:var(--card);box-shadow:0 32px 90px rgba(15,61,126,.15);text-align:center;backdrop-filter:blur(18px)}.code{color:#1268ed;font-size:clamp(76px,16vw,140px);font-weight:800;letter-spacing:-.08em;line-height:.9}.eyebrow{display:block;margin-top:24px;color:#1268ed;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}h1{margin:12px 0;font-size:clamp(34px,6vw,56px);letter-spacing:-.05em}p{max-width:500px;margin:0 auto 28px;color:var(--muted);font-size:17px;line-height:1.7}button.retry{padding:14px 22px;border:0;border-radius:999px;background:#1268ed;color:#fff;font-weight:800;cursor:pointer}@media(max-width:600px){header{padding:18px 16px}header img{width:124px}main{margin:5vh auto;padding:36px 20px;border-radius:24px}}
+  </style>
+</head>
+<body>
+  <header><div><img class="logo-light" src="/brand/nexio-logo-light.webp" alt="Nexio Lab"><img class="logo-dark" src="/brand/nexio-logo-dark.webp" alt="Nexio Lab"></div><div class="langs" aria-label="Language"><button data-lang="en">EN</button><button data-lang="ru">RU</button><button data-lang="uz">UZ</button></div></header>
+  <main><div class="code">OFF</div><span class="eyebrow" data-copy="eyebrow"></span><h1 data-copy="title"></h1><p data-copy="text"></p><button class="retry" type="button" onclick="location.reload()"><span data-copy="retry"></span> ↗</button></main>
+  <script>
+    const copy={ru:{eyebrow:'Нет подключения',title:'Вы сейчас офлайн',text:'Проверьте интернет-соединение. Как только сеть появится, Nexio Lab снова будет доступен.',retry:'Повторить'},en:{eyebrow:'No connection',title:'You are offline',text:'Check your internet connection. Nexio Lab will be available again as soon as the network returns.',retry:'Try again'},uz:{eyebrow:'Aloqa yo‘q',title:'Siz offlaynsiz',text:'Internet aloqasini tekshiring. Tarmoq qaytishi bilan Nexio Lab yana ochiladi.',retry:'Qayta urinish'}};
+    const language=['en','ru','uz'].includes(localStorage.getItem('nexio-language'))?localStorage.getItem('nexio-language'):'ru';document.documentElement.lang=language;document.body.classList.toggle('dark',localStorage.getItem('nexio-theme')==='dark');document.querySelectorAll('[data-copy]').forEach((node)=>node.textContent=copy[language][node.dataset.copy]);document.querySelectorAll('[data-lang]').forEach((button)=>{button.classList.toggle('active',button.dataset.lang===language);button.onclick=()=>{localStorage.setItem('nexio-language',button.dataset.lang);location.reload()}})
+  </script>
+</body>
+</html>

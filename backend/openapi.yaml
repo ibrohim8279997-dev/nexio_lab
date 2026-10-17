@@ -1,0 +1,402 @@
+openapi: 3.1.0
+info:
+  title: Nexio Lab API
+  version: 1.0.0
+  description: Versioned JSON contract. Dates use ISO 8601. Errors always use the ErrorEnvelope schema.
+servers:
+  - url: /api/v1
+tags:
+  - name: Public
+  - name: Client
+  - name: Admin auth
+  - name: Admin CRM
+  - name: Admin content
+paths:
+  /home:
+    get:
+      tags: [Public]
+      responses:
+        '200': { $ref: '#/components/responses/Home' }
+  /site:
+    get:
+      tags: [Public]
+      responses:
+        '200': { $ref: '#/components/responses/Site' }
+  /services:
+    get:
+      tags: [Public]
+      parameters: [{ $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/PerPage' }]
+      responses:
+        '200': { $ref: '#/components/responses/ServiceList' }
+  /services/{slug}:
+    get:
+      tags: [Public]
+      parameters: [{ $ref: '#/components/parameters/Slug' }]
+      responses:
+        '200': { description: Published service, content in `data`, content: { application/json: { schema: { $ref: '#/components/schemas/ServiceEnvelope' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /projects:
+    get:
+      tags: [Public]
+      parameters: [{ $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/PerPage' }]
+      responses:
+        '200': { description: Published projects with `data`, `meta`, and `links` }
+  /projects/{slug}:
+    get:
+      tags: [Public]
+      parameters: [{ $ref: '#/components/parameters/Slug' }]
+      responses:
+        '200': { description: Published project in `data` }
+        '404': { $ref: '#/components/responses/Error' }
+  /employees:
+    get:
+      tags: [Public]
+      parameters: [{ $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/PerPage' }]
+      responses:
+        '200': { description: Public employees with `data`, `meta`, and `links` }
+  /employees/{slug}:
+    get:
+      tags: [Public]
+      description: Returns the public profile or 301 redirects a historical slug to the current API URL.
+      parameters: [{ $ref: '#/components/parameters/Slug' }]
+      responses:
+        '200': { description: Employee profile and approved reviews in `data` }
+        '301': { description: Historical slug redirect }
+        '404': { $ref: '#/components/responses/Error' }
+  /reviews:
+    get:
+      tags: [Public]
+      parameters: [{ $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/PerPage' }]
+      responses:
+        '200': { description: Approved reviews only }
+  /client/csrf:
+    get:
+      tags: [Client]
+      responses:
+        '200': { description: Session CSRF token in `data.token` }
+  /client/access/exchange:
+    post:
+      tags: [Client]
+      description: Consumes a one-time invitation and sets an HttpOnly order-scoped client cookie.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [token], properties: { token: { type: string, minLength: 32, maxLength: 512 } } } } }
+      responses:
+        '200': { description: Access granted }
+        '410': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /client/order:
+    get:
+      tags: [Client]
+      security: [{ clientCookie: [] }]
+      responses:
+        '200': { description: Only the order bound to the client cookie }
+        '401': { $ref: '#/components/responses/Error' }
+  /client/order/brief:
+    put:
+      tags: [Client]
+      security: [{ clientCookie: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [brief], properties: { brief: { type: object, additionalProperties: { type: [string, 'null'], maxLength: 5000 }, maxProperties: 30 } } } } }
+      responses:
+        '200': { description: Updated client order }
+        '401': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /client/order/review:
+    post:
+      tags: [Client]
+      security: [{ clientCookie: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [rating, text], properties: { rating: { type: integer, minimum: 1, maximum: 5 }, text: { type: string, maxLength: 3000 }, employee_slug: { type: [string, 'null'] } } } } }
+      responses:
+        '201': { description: Pending review created }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /client/logout:
+    post:
+      tags: [Client]
+      security: [{ clientCookie: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '200': { description: Session revoked and cookie removed }
+  /admin/auth/login:
+    post:
+      tags: [Admin auth]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [email, password], properties: { email: { type: string, format: email }, password: { type: string, maxLength: 255 } } } } }
+      responses:
+        '200': { description: Authenticated staff user }
+        '202': { description: Owner/admin must submit TOTP; `data.two_factor_required` is true }
+        '403': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /admin/auth/2fa/verify:
+    post:
+      tags: [Admin auth]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [code], properties: { code: { type: string, pattern: '^[0-9]{6}$' } } } } }
+      responses:
+        '200': { description: Authenticated owner/admin }
+        '422': { $ref: '#/components/responses/Error' }
+  /admin/auth/me:
+    get:
+      tags: [Admin auth]
+      security: [{ adminSession: [] }]
+      responses:
+        '200': { description: Current user name, email and role }
+        '401': { $ref: '#/components/responses/Error' }
+  /admin/auth/logout:
+    post:
+      tags: [Admin auth]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '200': { description: Session invalidated }
+  /admin/orders:
+    get:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/OrderStatus' } }
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PerPage' }
+      responses:
+        '200': { description: Owner/admin sees all; staff sees assigned orders only }
+    post:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/OrderWrite' } } }
+      responses:
+        '201': { description: Order created; owner/admin only }
+        '403': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /admin/orders/{order}:
+    get:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/OrderId' }]
+      responses:
+        '200': { description: Scoped order detail }
+        '404': { $ref: '#/components/responses/Error' }
+  /admin/orders/{order}/assignees:
+    put:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/OrderId' }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [employee_ids], properties: { employee_ids: { type: array, maxItems: 30, items: { type: integer } } } } } }
+      responses:
+        '200': { description: Assignees synchronized; owner/admin only }
+        '403': { $ref: '#/components/responses/Error' }
+  /admin/orders/{order}/status:
+    put:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/OrderId' }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [status], properties: { status: { $ref: '#/components/schemas/OrderStatus' }, note: { type: [string, 'null'], maxLength: 2000 } } } } }
+      responses:
+        '200': { description: Status updated and history appended }
+        '404': { $ref: '#/components/responses/Error' }
+  /admin/orders/{order}/history:
+    get:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/OrderId' }]
+      responses:
+        '200': { description: Scoped status history }
+  /admin/orders/{order}/client-access:
+    post:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/OrderId' }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { expires_in_hours: { type: integer, minimum: 1, maximum: 168, default: 48 } } } } }
+      responses:
+        '201': { description: Previous access revoked; one-time invitation URL returned once }
+    delete:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/OrderId' }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '200': { description: Active access revoked }
+  /admin/reviews:
+    get:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [pending, approved, rejected] } }
+        - { $ref: '#/components/parameters/Page' }
+      responses:
+        '200': { description: Review moderation queue; owner/admin only }
+  /admin/reviews/{review}/moderate:
+    put:
+      tags: [Admin CRM]
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: review, in: path, required: true, schema: { type: integer } }
+        - { $ref: '#/components/parameters/Csrf' }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [status], properties: { status: { type: string, enum: [approved, rejected] }, note: { type: [string, 'null'], maxLength: 2000 } } } } }
+      responses:
+        '200': { description: Review moderated; immutable original text retained and history appended }
+  /admin/site-settings:
+    get:
+      tags: [Admin content]
+      security: [{ adminSession: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/Site' }
+    put:
+      tags: [Admin content]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SiteSettings' } } }
+      responses:
+        '200': { $ref: '#/components/responses/Site' }
+        '422': { $ref: '#/components/responses/Error' }
+  /admin/media:
+    post:
+      tags: [Admin content]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { type: object, required: [image], properties: { image: { type: string, format: binary, description: JPEG/PNG/WebP, 64–8000 px, maximum 8 MiB } } }
+      responses:
+        '201': { description: Randomized public media path and URL }
+        '422': { $ref: '#/components/responses/Error' }
+  /admin/{resource}:
+    parameters:
+      - { $ref: '#/components/parameters/Resource' }
+    get:
+      tags: [Admin content]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/Page' }, { name: search, in: query, schema: { type: string } }, { name: published, in: query, schema: { type: boolean } }]
+      responses:
+        '200': { description: Paginated service, project, or employee records }
+    post:
+      tags: [Admin content]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, description: Resource fields defined by Service, Project or Employee schemas } } }
+      responses:
+        '201': { description: Record created }
+        '422': { $ref: '#/components/responses/Error' }
+  /admin/{resource}/{record}:
+    parameters:
+      - { $ref: '#/components/parameters/Resource' }
+      - { name: record, in: path, required: true, schema: { type: integer } }
+    get:
+      tags: [Admin content]
+      security: [{ adminSession: [] }]
+      responses:
+        '200': { description: Record in `data` }
+    put:
+      tags: [Admin content]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, description: Partial resource payload } } }
+      responses:
+        '200': { description: Updated record }
+        '422': { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Admin content]
+      security: [{ adminSession: [] }]
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '200': { description: Deleted; employees use soft deletion }
+components:
+  securitySchemes:
+    adminSession: { type: apiKey, in: cookie, name: nexio_lab_session }
+    clientCookie: { type: apiKey, in: cookie, name: nexio_client_session }
+  parameters:
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    PerPage: { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 100 } }
+    Slug: { name: slug, in: path, required: true, schema: { type: string, pattern: '^[A-Za-z0-9_-]+$' } }
+    OrderId: { name: order, in: path, required: true, schema: { type: integer } }
+    Resource: { name: resource, in: path, required: true, schema: { type: string, enum: [services, projects, employees] } }
+    Csrf: { name: X-CSRF-TOKEN, in: header, required: true, schema: { type: string } }
+  schemas:
+    OrderStatus: { type: string, enum: [new, briefing, in_progress, review, completed, cancelled] }
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, fields]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            fields: { type: object, additionalProperties: true }
+            request_id: { type: [string, 'null'], format: uuid }
+    Service:
+      type: object
+      required: [slug, name, short_description]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        short_description: { type: string }
+        summary: { type: string }
+        description: { type: string }
+        cover_url: { type: [string, 'null'], format: uri }
+    ServiceEnvelope: { type: object, properties: { data: { $ref: '#/components/schemas/Service' } } }
+    SiteSettings:
+      type: object
+      required: [slogan, availability_text, address_confirmed]
+      properties:
+        logo_path: { type: [string, 'null'], maxLength: 2048 }
+        slogan: { type: string, maxLength: 120 }
+        intro_text: { type: [string, 'null'], maxLength: 5000 }
+        about_text: { type: [string, 'null'], maxLength: 20000 }
+        phone: { type: [string, 'null'], maxLength: 50 }
+        telegram: { type: [string, 'null'], maxLength: 255 }
+        whatsapp: { type: [string, 'null'], maxLength: 255 }
+        email: { type: [string, 'null'], format: email }
+        availability_text: { type: string, maxLength: 120 }
+        address: { type: [string, 'null'], maxLength: 500 }
+        address_confirmed: { type: boolean }
+    OrderWrite:
+      type: object
+      required: [client_name, client_email, currency]
+      properties:
+        service_id: { type: [integer, 'null'] }
+        client_name: { type: string, maxLength: 255 }
+        client_email: { type: string, format: email, maxLength: 255 }
+        client_phone: { type: [string, 'null'], maxLength: 50 }
+        description: { type: [string, 'null'], maxLength: 30000 }
+        agreed_price: { type: [number, 'null'], minimum: 0 }
+        currency: { type: string, minLength: 3, maxLength: 3 }
+        due_at: { type: [string, 'null'], format: date }
+  responses:
+    Error:
+      description: Standard API error
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }
+    Home:
+      description: Site settings, published services/projects/employees/reviews in `data`
+    Site:
+      description: Public or administrative site settings in `data`
+    ServiceList:
+      description: Published services with `data`, pagination `meta`, and `links`

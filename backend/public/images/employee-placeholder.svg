@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="title description">
+  <title id="title">Employee placeholder</title>
+  <desc id="description">Neutral Nexio Lab profile placeholder</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1d71ec"/>
+      <stop offset="1" stop-color="#071b3c"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="96" fill="url(#background)"/>
+  <circle cx="320" cy="240" r="112" fill="#fff" opacity=".92"/>
+  <path d="M112 568c18-124 96-196 208-196s190 72 208 196" fill="#fff" opacity=".92"/>
+  <path d="M70 70h118" stroke="#83b7ff" stroke-width="14" stroke-linecap="round" opacity=".8"/>
+</svg>
