@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    // Nexio CRM inbound API. Values MUST come from the agreed contract with the CRM developer.
+    'nexio_crm' => [
+        'url' => env('NEXIO_CRM_URL'),
+        'secret' => env('NEXIO_CRM_SECRET'),
+        'auth_scheme' => env('NEXIO_CRM_AUTH_SCHEME', 'bearer'), // bearer | header
+        'auth_header' => env('NEXIO_CRM_AUTH_HEADER', 'X-API-Key'),
+        'lead_id_key' => env('NEXIO_CRM_LEAD_ID_KEY', 'id'),
+        'source' => env('NEXIO_CRM_SOURCE', 'Website / NexioLab.uz'),
+        'timeout' => (int) env('NEXIO_CRM_TIMEOUT', 10),
+    ],
+
 ];

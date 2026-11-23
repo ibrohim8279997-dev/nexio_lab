@@ -1,5 +1,6 @@
 import { ErrorState, LoadingState, PageIntro } from '../components/States'
 import { useResource } from '../hooks/useResource'
+import { ProjectInquiryForm } from '../components/ProjectInquiryForm'
 import { useI18n } from '../i18n'
 import { api } from '../lib/api'
 import type { PublicContacts, SiteContent } from '../types'
@@ -31,5 +32,5 @@ export function ContactPage() {
   return <><PageIntro eyebrow={t('contacts.eyebrow')} title={t('contacts.title')}><p>{t('contacts.lead')}</p></PageIntro><section className="section"><div className="container contact-grid"><div>
     <span className="eyebrow">{t('contacts.connect')}</span>
     {loading ? <LoadingState/> : error ? <ErrorState message={error} retry={reload}/> : channels.length ? <div className="contact-list">{data?.director_name && <p className="contact-director">{t('contacts.director')}: {data.director_name}</p>}{channels.map(([kind, label, value]) => <a key={kind} href={channelHref(kind, value)} target={kind === 'phone' || kind === 'email' ? undefined : '_blank'} rel="noreferrer"><span>{label}</span><strong>{value}</strong><b>↗</b></a>)}</div> : <div className="contact-pending"><h2>{t('contacts.emptyTitle')}</h2><p>{t('contacts.emptyText')}</p></div>}
-  </div><aside className="contact-note"><span className="status-dot"><i/> {data?.online_label || t('footer.online')}</span><h2>{t('contacts.what')}</h2><ul><li>{t('contacts.l1')}</li><li>{t('contacts.l2')}</li><li>{t('contacts.l3')}</li><li>{t('contacts.l4')}</li></ul><p>{t('contacts.after')}</p></aside></div></section></>
+  </div><aside className="contact-note"><span className="status-dot"><i/> {data?.online_label || t('footer.online')}</span><h2>{t('contacts.what')}</h2><ul><li>{t('contacts.l1')}</li><li>{t('contacts.l2')}</li><li>{t('contacts.l3')}</li><li>{t('contacts.l4')}</li></ul><p>{t('contacts.after')}</p></aside></div></section><ProjectInquiryForm/></>
 }

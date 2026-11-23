@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Admin\OrderController;
 use App\Http\Controllers\Api\V1\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Api\V1\Admin\ServicePlanController;
 use App\Http\Controllers\Api\V1\Client\AccessController;
+use App\Http\Controllers\Api\V1\ProjectInquiryController;
 use App\Http\Controllers\Api\V1\PublicContentController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,7 @@ Route::prefix('v1')->group(function (): void {
     Route::get('/employees', [PublicContentController::class, 'employees']);
     Route::get('/employees/{slug}', [PublicContentController::class, 'employee'])->name('public.employees.show');
     Route::get('/reviews', [PublicContentController::class, 'reviews']);
+    Route::post('/project-inquiries', [ProjectInquiryController::class, 'store'])->middleware('throttle:project-inquiry');
 
     Route::prefix('admin')->group(function (): void {
         Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');

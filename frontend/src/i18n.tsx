@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { portalMessages } from './translations/portal'
+import { inquiryMessages } from './translations/inquiry'
 
 export type Language = 'en' | 'ru' | 'uz'
 type Messages = Record<string, string>
@@ -7,6 +8,7 @@ type Messages = Record<string, string>
 const messages: Record<Language, Messages> = {
   ru: {
     ...portalMessages.ru,
+    ...inquiryMessages.ru,
     'services.designTitle': 'Выберите оформление сайта', 'services.designText': 'Можно выбрать по одному варианту из каждой группы или оставить решение нашей команде.', 'services.designPalette': 'Цветовая гамма', 'services.designFont': 'Шрифт', 'services.designStyle': 'Стиль сайта', 'services.designChoose': 'Выбрать', 'services.designSelected': 'В Telegram будут отправлены коды', 'services.designReset': 'Сбросить выбор',
     'services.designCustomColors': 'Своя цветовая гамма', 'services.designCustomHint': 'Выберите три цвета или введите HEX-коды.', 'services.designCustomColor': 'Свой цвет', 'services.designCustomApply': 'Использовать мои цвета', 'services.designCustomRemove': 'Отменить свои цвета',
     'service.systems.name': 'Системы', 'service.systems.summary': 'CRM, складской учёт и системы управления бизнесом.', 'service.applications.name': 'Приложения', 'service.applications.summary': 'Android APK и Windows-приложения под ключ.',
@@ -31,6 +33,7 @@ const messages: Record<Language, Messages> = {
   },
   en: {
     ...portalMessages.en,
+    ...inquiryMessages.en,
     'services.designTitle': 'Choose your website look', 'services.designText': 'Choose one option from each group or leave the decision to our team.', 'services.designPalette': 'Color palette', 'services.designFont': 'Font', 'services.designStyle': 'Website style', 'services.designChoose': 'Choose', 'services.designSelected': 'Codes sent to Telegram', 'services.designReset': 'Reset selection',
     'services.designCustomColors': 'Custom color palette', 'services.designCustomHint': 'Pick three colors or enter their HEX codes.', 'services.designCustomColor': 'Custom color', 'services.designCustomApply': 'Use my colors', 'services.designCustomRemove': 'Remove custom colors',
     'service.systems.name': 'Systems', 'service.systems.summary': 'CRM, inventory and business management systems.', 'service.applications.name': 'Applications', 'service.applications.summary': 'Turnkey Android APK and Windows applications.',
@@ -55,6 +58,7 @@ const messages: Record<Language, Messages> = {
   },
   uz: {
     ...portalMessages.uz,
+    ...inquiryMessages.uz,
     'services.designTitle': 'Sayt ko‘rinishini tanlang', 'services.designText': 'Har bir guruhdan bittadan variant tanlang yoki tanlovni jamoamizga qoldiring.', 'services.designPalette': 'Ranglar palitrasi', 'services.designFont': 'Shrift', 'services.designStyle': 'Sayt uslubi', 'services.designChoose': 'Tanlash', 'services.designSelected': 'Telegramga yuboriladigan kodlar', 'services.designReset': 'Tanlovni tozalash',
     'services.designCustomColors': 'O‘z ranglarim', 'services.designCustomHint': 'Uchta rangni tanlang yoki HEX kodlarini kiriting.', 'services.designCustomColor': 'O‘z rangingiz', 'services.designCustomApply': 'Ranglarimni ishlatish', 'services.designCustomRemove': 'O‘z ranglarimni bekor qilish',
     'service.systems.name': 'Tizimlar', 'service.systems.summary': 'CRM, ombor hisobi va biznes boshqaruv tizimlari.', 'service.applications.name': 'Ilovalar', 'service.applications.summary': 'Android APK va Windows ilovalari tayyor holatda.',

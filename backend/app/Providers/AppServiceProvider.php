@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('login', fn (Request $request): Limit => Limit::perMinute(5)->by(strtolower((string) $request->input('email')).'|'.$request->ip()));
         RateLimiter::for('client-exchange', fn (Request $request): Limit => Limit::perMinute(10)->by($request->ip()));
+        RateLimiter::for('project-inquiry', fn (Request $request): array => [Limit::perMinute(3)->by($request->ip()), Limit::perDay(20)->by($request->ip())]);
         RateLimiter::for('client-write', fn (Request $request): Limit => Limit::perMinute(20)->by($request->ip()));
     }
 }
