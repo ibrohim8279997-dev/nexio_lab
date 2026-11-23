@@ -44,6 +44,8 @@ return [
         'lead_id_key' => env('NEXIO_CRM_LEAD_ID_KEY', 'id'),
         'source' => env('NEXIO_CRM_SOURCE', 'Website / NexioLab.uz'),
         'timeout' => (int) env('NEXIO_CRM_TIMEOUT', 10),
+        // Keep true. Set false ONLY as a temporary stopgap while the CRM host has a self-signed certificate.
+        'verify_ssl' => (bool) env('NEXIO_CRM_VERIFY_SSL', true),
     ],
 
 ];

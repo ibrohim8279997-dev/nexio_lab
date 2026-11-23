@@ -67,6 +67,7 @@ class CrmClient
         $cfg = config('services.nexio_crm');
         $request = Http::acceptJson()->asJson()
             ->timeout((int) $cfg['timeout'])->connectTimeout(5)
+            ->withOptions(['verify' => (bool) ($cfg['verify_ssl'] ?? true)])
             ->withHeaders(['Idempotency-Key' => $i->external_order_id]);
 
         $request = $cfg['auth_scheme'] === 'bearer'
