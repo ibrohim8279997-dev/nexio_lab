@@ -9,6 +9,10 @@ Run a worker for retries: `php artisan queue:work`.
 Idempotency: browser `submission_id` (uuid) is unique, so double clicks/resends never create a second row;
 `external_order_id` is sent in the payload and as `Idempotency-Key` on every retry.
 
+## Deal amount
+The website sends no numeric amount (only the client's budget range, inside `notes`), so the CRM creates the deal with
+value 0. `notes` starts with a "DEAL AMOUNT NOT SET" line: the admin must enter the exact amount in the CRM after the lead arrives.
+
 ## Environment (backend/.env only; never in frontend)
 NEXIO_CRM_URL, NEXIO_CRM_SECRET, NEXIO_CRM_AUTH_SCHEME (bearer|header), NEXIO_CRM_AUTH_HEADER, NEXIO_CRM_LEAD_ID_KEY,
 NEXIO_CRM_SOURCE ("Website / NexioLab.uz"), NEXIO_CRM_TIMEOUT.

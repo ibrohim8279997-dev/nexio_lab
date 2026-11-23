@@ -29,6 +29,10 @@ class CrmClient
     public function payload(ProjectInquiry $i): array
     {
         $lines = array_filter([
+            // The website never sends a deal amount (the CRM then creates the deal with value 0),
+            // only the client's budget range, so the admin must set the exact amount by hand.
+            '!!! DEAL AMOUNT NOT SET: admin must enter the exact amount in the deal. The budget below is only the client\'s range.',
+            '',
             'Project type: '.$i->project_type,
             'Budget: '.$i->estimated_budget.' '.$i->currency,
             $i->timeframe ? 'Timeframe: '.$i->timeframe : null,
