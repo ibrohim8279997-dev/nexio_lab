@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './styles.css'
 import './theme.css'
+import './template.css'
 import { applyStoredTheme } from './components/ThemeToggle'
 import { I18nProvider } from './i18n'
 

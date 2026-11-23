@@ -4,7 +4,7 @@ import { useI18n } from '../i18n'
 type Theme = 'light' | 'dark'
 
 function readTheme(): Theme {
-  return window.localStorage.getItem('nexio-theme') === 'dark' ? 'dark' : 'light'
+  return window.localStorage.getItem('nexio-theme') === 'light' ? 'light' : 'dark'
 }
 
 export function applyStoredTheme() {
