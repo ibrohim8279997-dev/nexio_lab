@@ -8,17 +8,17 @@
 #   backend/composer.*              -> composer install
 #   backend/database/               -> maintenance rejimi + migrate
 #   backend/**                      -> kesh qayta qurish + queue:restart (CRM'ga yuborish navbati)
-#   frontend/ (src, package*.json...) -> npm ci + build (frontend/dist) + PM2 orqali 3001 portda berish
+#   frontend/ (src, package*.json...) -> npm ci + build (frontend/dist) + PM2 orqali 3000 portda berish
 # Oxirgi muvaffaqiyatli deploy commit'i .last-deploy faylida saqlanadi, shuning uchun yarim
 # yo'lda to'xtagan deploy keyingi safar to'liq qaytadan bajariladi.
 #
-# Portlar: frontend (statik dist, SPA) — FRONT_PORT=3001. Laravel API PHP-FPM orqali ishlaydi;
-# nginx /api va /storage so'rovlarini Laravel'ga (backend/public), qolganini 127.0.0.1:3001 ga yo'naltirishi kerak.
+# Portlar: frontend (statik dist, SPA) — FRONT_PORT=3000. Laravel API PHP-FPM orqali ishlaydi;
+# nginx /api va /storage so'rovlarini Laravel'ga (backend/public), qolganini 127.0.0.1:3000 ga yo'naltirishi kerak.
 #
 # GitHub token faqat birinchi pull'da so'raladi va ~/.git-credentials'da saqlanadi.
 #
 # Env: FORCE=1 (hamma qadamlar), SKIP_PULL=1, SKIP_FRONTEND=1, BRANCH (main), PHP (php),
-#      PM2_APP (nexio-lab), PM2_QUEUE (nexio-lab-queue), FRONT_PORT (3001).
+#      PM2_APP (nexio-lab), PM2_QUEUE (nexio-lab-queue), FRONT_PORT (3000).
 set -euo pipefail
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -26,7 +26,7 @@ BRANCH="${BRANCH:-main}"
 PHP="${PHP:-php}"
 PM2_APP="${PM2_APP:-nexio-lab}"
 PM2_QUEUE="${PM2_QUEUE:-nexio-lab-queue}"
-FRONT_PORT="${FRONT_PORT:-3001}"
+FRONT_PORT="${FRONT_PORT:-3000}"
 STATE_FILE="$APP_DIR/.last-deploy"
 
 log()  { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
@@ -174,7 +174,7 @@ if [[ "$NEED_FRONTEND" == "1" ]]; then
     serve_frontend
 else
     skip "frontend fayllari o'zgarmagan"
-    # Jarayon yo'q bo'lib qolgan bo'lsa (masalan server qayta ishga tushgan), 3001 portda qayta ko'taramiz.
+    # Jarayon yo'q bo'lib qolgan bo'lsa (masalan server qayta ishga tushgan), 3000 portda qayta ko'taramiz.
     if command -v pm2 >/dev/null && ! pm2 describe "$PM2_APP" >/dev/null 2>&1 && [[ -d dist ]]; then serve_frontend; fi
 fi
 
