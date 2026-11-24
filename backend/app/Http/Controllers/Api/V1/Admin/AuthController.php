@@ -22,23 +22,6 @@ class AuthController extends Controller
         $request->session()->regenerate();
         $user = $request->user();
 
-        if (in_array($user->role, ['owner', 'admin'], true)) {
-            if ($this->canBypassTwoFactor()) {
-                return response()->json(['data' => $this->userData($user)]);
-            }
-
-            if (! $user->two_factor_secret || ! $user->two_factor_confirmed_at) {
-                Auth::logout();
-
-                return response()->json(['error' => ['code' => 'TWO_FACTOR_NOT_CONFIGURED', 'message' => 'Administrator two-factor authentication is required.', 'fields' => (object) [], 'request_id' => $request->header('X-Request-Id')]], 403);
-            }
-
-            $request->session()->put('pending_2fa_user_id', $user->id);
-            Auth::logout();
-
-            return response()->json(['data' => ['two_factor_required' => true]], 202);
-        }
-
         return response()->json(['data' => $this->userData($user)]);
     }
 
@@ -75,10 +58,5 @@ class AuthController extends Controller
     private function userData(User $user): array
     {
         return ['name' => $user->name, 'email' => $user->email, 'role' => $user->role];
-    }
-
-    private function canBypassTwoFactor(): bool
-    {
-        return app()->environment(['local', 'testing']) && config('auth.admin_2fa_bypass') === true;
     }
 }

@@ -28,8 +28,8 @@ class DatabaseSeeder extends Seeder
         SiteSetting::query()->firstOrCreate([], ['slogan' => 'Future Starts Here', 'intro_text' => 'Nexio Lab demo content. Replace before launch.', 'about_text' => 'We create websites and applications. Replace this demo content before launch.', 'availability_text' => 'Working online', 'address_confirmed' => false]);
         $this->call(ServicePlanSeeder::class);
 
-        if (env('ADMIN_EMAIL') && env('ADMIN_PASSWORD') && env('ADMIN_2FA_SECRET')) {
-            User::query()->updateOrCreate(['email' => env('ADMIN_EMAIL')], ['name' => env('ADMIN_NAME', 'Nexio Lab Owner'), 'password' => env('ADMIN_PASSWORD'), 'role' => 'owner', 'two_factor_secret' => env('ADMIN_2FA_SECRET'), 'two_factor_confirmed_at' => now()]);
+        if (env('ADMIN_EMAIL') && env('ADMIN_PASSWORD')) {
+            User::query()->updateOrCreate(['email' => env('ADMIN_EMAIL')], ['name' => env('ADMIN_NAME', 'Nexio Lab Owner'), 'password' => env('ADMIN_PASSWORD'), 'role' => 'owner']);
         }
     }
 }
